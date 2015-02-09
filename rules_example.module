@@ -1,0 +1,60 @@
+<?php
+/**
+ * @file
+ * Testing custom rule events, conditions and actions
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function rules_example_menu() {
+  $items = array();
+
+  $items['rules-example'] = array(
+    'type' => MENU_CALLBACK,
+    'access callback' => TRUE,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('rules_example_form'),
+  );
+
+  return $items;
+}
+
+/**
+ * Form callback for rules_example_form.
+ */
+function rules_example_form() {
+
+  $form['name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Name of something that\'s going to happen!'),
+    '#required' => TRUE,
+  );
+
+  $form['submit'] = array(
+    '#value' => 'Submit',
+    '#type' => 'submit',
+  );
+
+  return $form;
+}
+
+/**
+ * Submit callback for rules_example_form_submit
+ */
+function rules_example_form_submit($form, &$form_state) {
+
+  global $user;
+  $something_name = $form_state['values']['name'];
+
+  // Triggers custom event in rules_example module
+  rules_invoke_event('rules_example_event_something_happen', $user, $something_name);
+
+  // Add a log so that we can track easily
+  watchdog('rules_example', t('User @username triggers something named @name!',
+    array(
+      '@username' => $user->name,
+      '@name' => $something_name,
+    )
+  ));
+}

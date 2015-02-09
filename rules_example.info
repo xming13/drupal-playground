@@ -1,0 +1,3 @@
+name = Rules Example
+description = Test module to add new actions, events, and conditions
+core = 7.x
