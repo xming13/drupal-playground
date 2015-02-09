@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Rules example module to create custom actions, events, and conditions
+ * Rules example module to create custom events, conditions and actions
  */
 
 /**
@@ -13,6 +13,16 @@ function rules_example_rules_event_info() {
     'rules_example_event_something_happen' => array(
       'label' => t('Something happens!'),
       'group' => t('Rules Example'),
+      'variables' => array(
+        'user' => array(
+          'type' => 'user',
+          'label' => t('User'),
+        ),
+        'name' => array(
+          'type' => 'text',
+          'label' => t('Name of something'),
+        )
+      ),
     ),
   );
 
