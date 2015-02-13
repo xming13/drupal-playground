@@ -16,12 +16,12 @@ function rules_example_rules_event_info() {
       'variables' => array(
         'user' => array(
           'type' => 'user',
-          'label' => t('User'),
+          'label' => t('The user when something happens'),
         ),
         'name' => array(
           'type' => 'text',
           'label' => t('Name of something'),
-        )
+        ),
       ),
     ),
   );
@@ -37,9 +37,13 @@ function rules_example_rules_condition_info() {
     'rules_example_condition_name_compare' => array(
       'label' => t('Something\'s name to compare'),
       'parameter' => array(
+        'user' => array(
+          'type' => 'user',
+          'label' => t('The user when something happens'),
+        ),
         'name' => array(
-          'label' => t('Something\'s name'),
           'type' => 'text',
+          'label' => t('Name of something'),
         ),
       ),
       'group' => t('Rules Example'),
@@ -52,7 +56,7 @@ function rules_example_rules_condition_info() {
 /**
  * The condition function for rules_example_condition_name_compare
  */
-function rules_example_condition_name_compare($name) {
+function rules_example_condition_name_compare($user, $name) {
   return $name == 'something';
 }
 
@@ -107,8 +111,27 @@ function rules_example_action_hello_user($account_to, $account_from) {
  * Implements hook_rules_data_info().
  */
 function rules_example_rules_data_info() {
-  $data = array(
 
+  // When we configure action, the data selection tool must know the data type.
+  // E.g. if the variable is user, it must know the structure of user object
+  // - user.id, user.name..., so here is where we provide the definition of
+  // the custom data structure or data type.
+  $data = array(
+    'rules_example_view' => array(
+      'label' => t('view object'),
+      'wrap' => TRUE,
+      'property info' => array(
+        'machine_name' => array(
+          'type' => 'text',
+          'label' => t('Machine name'),
+        ),
+        'args' => array(
+          'type' => 'list<text>',
+          'label' => t('Arguments'),
+          'setter callback' => 'entity_property_verbatim_set'
+        ),
+      ),
+    ),
   );
 
   return $data;
