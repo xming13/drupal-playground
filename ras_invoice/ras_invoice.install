@@ -1,0 +1,114 @@
+<?php
+/**
+ * @file
+ * Install file for RAS Invoice module.
+ */
+
+/**
+ *  Implements hook_schema().
+ */
+function ras_invoice_schema() {
+  $schema['invoice'] = array(
+    'description' => 'The base table for invoices.',
+    'fields' => array(
+      'invoice_id' => array(
+        'description' => 'The primary identifier for an invoice.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'author_uid' => array(
+        'description' => 'The uid of the author of this invoice.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'client_uid' => array(
+        'description' => 'The uid of the client for this invoice.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'created_at' => array(
+        'description' => 'The timestamp when this invoice is created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0
+      ),
+      'updated_at' => array(
+        'description' => 'The timestamp when this invoice is last updated.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0
+      ),
+      'status' => array(
+        'description' => 'The status of the invoice.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'foreign keys' => array(
+      'author_uid' => array(
+        'table' => 'users',
+        'columns' => array('author_uid' => 'uid')
+      ),
+      'client_uid' => array(
+        'table' => 'users',
+        'columns' => array('client_uid' => 'uid')
+      ),
+    ),
+    'primary key' => array('invoice_id'),
+  );
+
+  $schema['invoice_item'] = array(
+    'description' => 'The base table for invoice items.',
+    'fields' => array(
+      'invoice_item_id' => array(
+        'description' => 'The primary identifier for an invoice item.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'description' => array(
+        'description' => 'The description for the invoice item.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'amount' => array(
+        'description' => 'The amount of the the invoice item.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'price' => array(
+        'description' => 'The price of the invoice item.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'invoice_id' => array(
+        'description' => 'The invoice id',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'foreign keys' => array(
+      'invoice_id' => array(
+        'table' => 'invoice',
+        'columns' => array('invoice_id' => 'invoice_id')
+      ),
+    ),
+    'primary key' => array('invoice_item_id'),
+  );
+
+  return $schema;
+}

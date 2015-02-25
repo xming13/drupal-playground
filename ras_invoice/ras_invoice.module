@@ -1,0 +1,272 @@
+<?php
+/**
+ * @file
+ * RAS Invoice and Invoice Item Entities
+ */
+
+/**
+ * Implements hook_entity_info().
+ */
+function ras_invoice_entity_info() {
+  $return['invoice'] = array(
+    'label' => t('Invoice'),
+    'label callback' => 'invoice_label',
+    'base table' => 'invoice',
+    'entity class' => 'Drupal\ras_invoice\Invoice',
+    'entity keys' => array(
+      'id' => 'invoice_id',
+    ),
+    'controller class' => 'Drupal\ras_invoice\InvoiceAPIController',
+    'access callback' => 'ras_invoice_access_callback',
+    'fieldable' => TRUE,
+    'bundles' => array(
+      'invoice' => array(
+        'label' => t('Invoice bundle'),
+        'admin' => array(
+          'path' => 'admin/structure/invoice',
+          'access arguments' => array('administer invoice'),
+        ),
+      ),
+    ),
+    'view modes' => array(
+      'full' => array(
+        'label' => t('Full Invoice'),
+        'custom settings' => FALSE,
+      ),
+    ),
+    'module' => 'ras_invoice',
+    // Enable the entity API's admin UI.
+    'admin ui' => array(
+      'path' => 'admin/structure/invoice',
+      'controller class' => 'Drupal\ras_invoice\InvoiceUIController',
+      'file' => 'ras_invoice.admin.inc',
+    ),
+  );
+
+  $return['invoice_item'] = array(
+    'label' => t('Invoice item'),
+    'label callback' => 'invoice_item_label',
+    'base table' => 'invoice_item',
+    'entity class' => 'Drupal\ras_invoice\InvoiceItem',
+    'entity keys' => array(
+      'id' => 'invoice_item_id',
+    ),
+    'controller class' => 'Drupal\ras_invoice\InvoiceItemAPIController',
+    'access callback' => 'invoice_item_access',
+    'fieldable' => TRUE,
+    'bundles' => array(
+      'invoice_item' => array(
+        'label' => t('Invoice item bundle'),
+        'admin' => array(
+          'path' => 'admin/structure/invoice-item',
+          'access arguments' => array('administer invoice item'),
+        ),
+      ),
+    ),
+    'view modes' => array(
+      'full' => array(
+        'label' => t('Default'),
+        'custom settings' => FALSE,
+      ),
+    ),
+    'module' => 'ras_invoice',
+    // Enable the entity API's admin UI.
+    'admin ui' => array(
+      'path' => 'admin/structure/invoice-item',
+      'controller class' => 'Drupal\ras_invoice\InvoiceItemUIController',
+      'file' => 'ras_invoice.admin.inc',
+    ),
+  );
+
+  return $return;
+}
+
+/**
+ * Label callback function for Invoice.
+ */
+function invoice_label($invoice) {
+  if (isset($invoice->invoice_id)) {
+    return 'Invoice no.' . $invoice->invoice_id;
+  }
+  else {
+    return 'Invoice';
+  }
+}
+
+/**
+ * Label callback function for Invoice item.
+ */
+function invoice_item_label($invoice_item) {
+  if (isset($invoice_item->invoice_item_id)) {
+    return 'Invoice item no.' . $invoice_item->invoice_item_id;
+  }
+  else {
+    return 'Invoice item';
+  }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function ras_invoice_menu() {
+ $items = array();
+
+  // This provides a place for Field API to hang its own
+  // interface and has to be the same as what was defined
+  // in basic_entity_info() above.
+//  $items['admin/structure/invoice/manage'] = array(
+//    'title' => 'Invoice',
+//    'description' => 'Manage Invoice Entities Structure',
+//    'page callback' => 'invoice_admin_page',
+//    'access arguments' => array('administer invoice entities'),
+//    'file' => 'ras_invoice.pages.inc',
+//  );
+
+//  $items['invoice/add'] = array(
+//    'title' => 'Add invoice',
+//    'description' => 'Add new invoice',
+//    'page callback' => 'invoice_add_invoice',
+//    'access arguments' => array('administer invoice entities'),
+//    'file' => 'ras_invoice.pages.inc',
+//  );
+
+  $invoice_uri = 'invoice/%invoice';
+  $invoice_uri_argument_position = 1;
+
+  $items['invoice/%invoice'] = array(
+    'title' => 'Invoice',
+    'page callback' => 'ras_invoice_view_invoice',
+    'page arguments' => array(1),
+    'access callback' => 'ras_invoice_access_callback',
+    'access arguments' => array('view', 1),
+    'file' => 'ras_invoice.pages.inc',
+  );
+
+//  $items[$invoice_uri . '/edit'] = array(
+//    'title' => 'Edit',
+//    'page callback' => 'invoice_edit_invoice',
+//    'page arguments' => array($invoice_uri_argument_position),
+//    'access callback' => TRUE,
+//    'type' => MENU_LOCAL_TASK,
+//    'file' => 'ras_invoice.pages.inc',
+//  );
+//
+//  $items[$invoice_uri . '/delete'] = array(
+//    'title' => 'Delete',
+//    'page callback' => 'invoice_delete_invoice',
+//    'page arguments' => array($invoice_uri_argument_position),
+//    'access callback' => TRUE,
+//    'type' => MENU_LOCAL_TASK,
+//    'weight' => 10,
+//    'file' => 'ras_invoice.pages.inc',
+//  );
+
+
+  $items['invoice-item/%invoice_item'] = array(
+    'title' => 'Invoice item',
+    'page callback' => 'ras_invoice_view_invoice_item',
+    'page arguments' => array(1),
+    'access callback' => 'ras_invoice_access_callback',
+    'access arguments' => array('view', 1),
+    'file' => 'ras_invoice.pages.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_entity_property_info_alter().
+ */
+function ras_invoice_entity_property_info_alter(&$info) {
+  $properties = &$info['invoice']['properties'];
+
+  $properties['created_at'] = array(
+    'label' => t('Date created'),
+    'type' => 'date',
+    'description' => t('The date the invoice was posted'),
+  );
+
+  $properties['updated_at'] = array(
+    'label' => t('Date changed'),
+    'type' => 'date',
+    'description' => t('The date the invoice was last updated'),
+  );
+
+  $properties['author_uid'] = array(
+    'label' => t('Author'),
+    'type' => 'user',
+    'description' => t('The author of the invoice'),
+    'required' => TRUE,
+  );
+
+  $properties['client_uid'] = array(
+    'label' => t('Client'),
+    'type' => 'user',
+    'description' => t('The client of the invoice'),
+    'required' => TRUE,
+  );
+}
+
+/**
+ * Implements hook_permission().
+ */
+function ras_invoice_permission() {
+  return array(
+    'administer invoice' => array(
+      'title' => t('Administer Invoice Entities'),
+    ),
+    'view invoice' => array(
+      'title' => t('View Invoice Entities'),
+    ),
+  );
+}
+
+/**
+ * Check access permissions for invoice entities.
+ */
+function ras_invoice_access_callback($op, $invoice = NULL, $account = NULL) {
+  if (($op == 'view' && user_access('view invoice', $account)) || user_access('administer invoice', $account)) {
+    return TRUE;
+  } else if (user_access('administer invoice', $account)) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+ * Load an Invoice
+ */
+function invoice_load($invoice_id, $reset = FALSE) {
+  $invoice = invoice_load_multiple(array($invoice_id), array(), $reset);
+  return reset($invoice);
+}
+
+/**
+ * Load multiple invoices based on certain conditions.
+ */
+function invoice_load_multiple($invoice_ids = array(), $conditions = array(), $reset = FALSE) {
+  return entity_load('invoice', $invoice_ids, $conditions, $reset);
+}
+
+/**
+ * Access callback for invoice item.
+ */
+function invoice_item_access() {
+  return TRUE;
+}
+
+/**
+ * Load an Invoice item
+ */
+function invoice_item_load($invoice_item_id, $reset = FALSE) {
+  $invoice_item = invoice_item_load_multiple(array($invoice_item_id), array(), $reset);
+  return reset($invoice_item);
+}
+
+/**
+ * Load multiple invoice items based on certain conditions.
+ */
+function invoice_item_load_multiple($invoice_item_ids = array(), $conditions = array(), $reset = FALSE) {
+  return entity_load('invoice_item', $invoice_item_ids, $conditions, $reset);
+}
+

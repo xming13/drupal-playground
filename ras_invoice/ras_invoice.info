@@ -1,0 +1,16 @@
+name = RAS Invoice
+description = A RAS Invoice and invoice item entities
+core = 7.x
+package = RAS Invoice
+
+dependencies[] = xautoload
+dependencies[] = entity
+
+files[] = ras_invoice.install
+files[] = ras_invoice.admin.inc
+files[] = src\Invoice.php
+files[] = src\InvoiceAPIController.php
+files[] = src\InvoiceUIController.php
+files[] = src\InvoiceItem.php
+files[] = src\InvoiceItemAPIController.php
+files[] = src\InvoiceItemUIController.php
