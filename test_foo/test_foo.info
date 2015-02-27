@@ -1,0 +1,6 @@
+name = Test Foo
+description = Solution to test_foo assignment
+core = 7.x
+package = Simple Test Assignment
+
+files[] = test_foo.test

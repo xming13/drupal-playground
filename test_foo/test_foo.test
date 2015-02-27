@@ -1,0 +1,36 @@
+<?php
+
+/**
+ * @file test file for test_foo
+ */
+class TestFooTestCase extends DrupalWebTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Test Foo',
+      'description' => 'Test cases for test_foo',
+      'group' => 'Test Assignment',
+    );
+  }
+
+  public function setUp() {
+    $modules[] = 'test_foo';
+    $modules[] = 'block';
+
+    parent::setUp($modules);
+  }
+
+  public function testPlacingBlockToRegion() {
+    $account = $this->drupalCreateUser(array('administer blocks'));
+    $this->drupalLogin($account);
+
+    // place the block to the region
+    $this->drupalPost('admin/structure/block', array(
+      'blocks[test_foo_test_foo_block][region]' => 'content'
+    ), t('Save blocks'));
+
+    $this->drupalGet('test_foo');
+
+    $this->assertText('Test Foo Subject', 'Test Foo Subject is found.');
+    $this->assertText('Test Foo Content', 'Test Foo Content is found.');
+  }
+}

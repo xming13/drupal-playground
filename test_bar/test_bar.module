@@ -1,0 +1,17 @@
+<?php
+/**
+ * @file test_bar module
+ */
+
+/**
+ * Implements hook_form_alter().
+ */
+function test_bar_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'user_register_form') {
+      $form['#validate'][] = function($form, $form_state) {
+        if (strpos(strtolower($form_state['values']['mail']), '@gmail.com') !== FALSE) {
+          form_set_error('name', 'Unfortunately we do not allow gmail. :(');
+        }
+      };
+  }
+}

@@ -1,0 +1,6 @@
+name = Test Bar
+description = Solution to test_bar assignment
+core = 7.x
+package = Simple Test Assignment
+
+files[] = test_bar.test

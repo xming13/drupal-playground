@@ -1,0 +1,56 @@
+<?php
+/**
+ * @file test_foo module
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function test_foo_menu() {
+  $items = array();
+
+  $items['test_foo'] = array(
+    'title' => t('Test Foo'),
+    'access callback' => TRUE,
+    'page callback' => 'test_foo_page_view',
+  );
+
+  return $items;
+}
+
+/**
+ * Page callback for test_foo
+ */
+function test_foo_page_view() {
+  return 'hello test foo';
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function test_foo_block_info() {
+  $blocks = array();
+
+  $blocks['test_foo_block'] = array(
+    'info' => t('A block for test foo'),
+    'cache' => DRUPAL_NO_CACHE,
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function test_foo_block_view($delta = '') {
+  $block = array();
+
+  switch($delta) {
+    case 'test_foo_block':
+      $block['subject'] = 'Test Foo Subject';
+      $block['content'] = 'Test Foo Content';
+      break;
+  }
+
+  return $block;
+}

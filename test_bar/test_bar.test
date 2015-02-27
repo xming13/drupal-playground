@@ -1,0 +1,28 @@
+<?php
+/**
+ * @file test file for test_bar
+ */
+class TestBarTestCase extends DrupalWebTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Test Bar',
+      'description' => 'Test cases for test_bar',
+      'group' => 'Test Assignment',
+    );
+  }
+
+  public function setUp() {
+    $modules[] = 'test_bar';
+
+    parent::setUp($modules);
+  }
+
+  public function testRegisterUser() {
+    $this->drupalPost('user/register', array(
+      'name' => 'testuser',
+      'mail' => 'testuser@gmail.com',
+    ), t('Create new account'));
+
+    $this->assertText('Unfortunately we do not allow gmail. :(', 'Gmail not allowed message is found.');
+  }
+}
